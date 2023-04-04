@@ -22,7 +22,9 @@ def pregunta_01():
     40
 
     """
-    return
+    num_filas = tbl0.shape[0]
+    #print(num_filas)
+    return num_filas
 
 
 def pregunta_02():
@@ -33,7 +35,9 @@ def pregunta_02():
     4
 
     """
-    return
+    num_columnas = tbl0.shape[1]
+    #print(num_columnas)
+    return num_columnas
 
 
 def pregunta_03():
@@ -50,7 +54,9 @@ def pregunta_03():
     Name: _c1, dtype: int64
 
     """
-    return
+    valores_unicos = tbl0['_c1'].value_counts().sort_index(ascending=True)
+    #print(valores_unicos)
+    return valores_unicos
 
 
 def pregunta_04():
@@ -65,7 +71,9 @@ def pregunta_04():
     E    4.785714
     Name: _c2, dtype: float64
     """
-    return
+    promedio_c2 = tbl0.groupby('_c1')['_c2'].mean()
+    #print(promedio_c2)
+    return promedio_c2
 
 
 def pregunta_05():
@@ -82,7 +90,9 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return
+    val_max_c2 = tbl0.groupby('_c1')['_c2'].max()
+    #print(val_max_c2)
+    return val_max_c2
 
 
 def pregunta_06():
@@ -94,7 +104,12 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+    val_4 = []
+    val_4 = tbl1['_c4'].unique().tolist()
+    val_4.sort()
+    val_4_up = [valor.upper() for valor in val_4]
+    #print(val_4_up)
+    return val_4_up
 
 
 def pregunta_07():
@@ -110,7 +125,9 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    suma_c2 = tbl0.groupby('_c1')['_c2'].sum()
+    #print(suma_c2)
+    return suma_c2
 
 
 def pregunta_08():
@@ -128,7 +145,9 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    tbl0["suma"] = tbl0["_c0"] + tbl0["_c2"]
+    #print(tbl0)
+    return tbl0
 
 
 def pregunta_09():
@@ -137,7 +156,7 @@ def pregunta_09():
 
     Rta/
         _c0 _c1  _c2         _c3  year
-    0     0   E    1  1999-02-28  1999
+    0     0   E    1  1999-0-28  1999
     1     1   A    2  1999-10-28  1999
     2     2   B    5  1998-05-02  1998
     ...
@@ -146,7 +165,9 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+    tbl0['year'] = tbl0["_c3"].str.extract(r"(\d{4})")
+    #print(tbl0)
+    return tbl0
 
 
 def pregunta_10():
@@ -162,8 +183,12 @@ def pregunta_10():
     2   C                    0:5:6:7:9
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
-    """
-    return
+    """    
+    grupos = tbl0.groupby('_c1')['_c2'].apply(list)
+    df_nuev = pd.DataFrame(grupos)    
+    df_nuev['_c2'] = df_nuev['_c2'].apply(lambda x: sorted(x))
+    df_nuev['_c2'] = df_nuev['_c2'].apply(lambda x: ':'.join(map(str, x)))
+    return df_nuev
 
 
 def pregunta_11():
@@ -182,8 +207,15 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
-
+    grupos = tbl1.groupby('_c0')['_c4'].apply(list)
+    df_11 = pd.DataFrame(grupos)
+    df_11.reset_index(inplace = True)
+    df_prueba = df_11
+    df_prueba['_c4'] = df_prueba['_c4'].apply(lambda x: sorted(x))
+    df_prueba['_c4'] = df_prueba['_c4'].apply(lambda x: ','.join(map(str, x)))
+    #print(df_prueba)
+    return df_prueba
+    
 
 def pregunta_12():
     """
@@ -200,7 +232,15 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    tbl2['_c5'] = tbl2.apply(lambda x: f"{x['_c5a']}:{x['_c5b']}", axis=1)
+    df_tb12 = tbl2.drop(columns=['_c5a', '_c5b'])
+    datos_new_df = df_tb12.groupby('_c0')['_c5'].apply(list)
+    df_12 = pd.DataFrame(datos_new_df)
+    df_12.reset_index(inplace = True)
+    df_12['_c5'] = df_12['_c5'].apply(lambda x: sorted(x))
+    df_12['_c5'] = df_12['_c5'].apply(lambda x: ','.join(map(str, x)))
+    #print(df_12)
+    return df_12
 
 
 def pregunta_13():
@@ -217,4 +257,29 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    # Combinar las tablas utilizando la columna _c0 como clave
+    merged = pd.merge(tbl0, tbl2, on='_c0')
+
+    # Agrupar por la columna _c1 y calcular la suma de la columna _c5b
+    result = merged.groupby('_c1')['_c5b'].sum()    
+    
+    return result
+
+# if __name__ == "__main__":
+#     import pandas as pd
+#     tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
+#     tbl1 = pd.read_csv("tbl1.tsv", sep="\t")
+#     tbl2 = pd.read_csv("tbl2.tsv", sep="\t")
+
+#     pregunta_01()
+#     pregunta_02()
+#     pregunta_03()
+#     pregunta_04()
+#     pregunta_05()
+#     pregunta_06()
+#     pregunta_07()
+#     pregunta_08()
+#     pregunta_09()
+#     pregunta_10()
+#     pregunta_11()
+#     pregunta_12()
